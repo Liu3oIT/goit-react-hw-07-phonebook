@@ -1,12 +1,16 @@
-export const getFilteredContacts = state => {
-  const { searchQuery } = state.filters;
-  const { contacts } = state.contacts; 
+import { createSelector } from '@reduxjs/toolkit';
 
-  if (!searchQuery) {
-    return contacts;
+export const selectContacts = state => state.contacts.contacts;
+export const selectFilter = state => state.filter;
+
+
+export const selectFilteredContacts = createSelector(
+  [selectContacts, selectFilter],
+  (contacts, filter) => {
+    return contacts?.filter(
+      contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase()) ||
+        contact.phone.includes(filter)
+    );
   }
-
-  return contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-};
+);

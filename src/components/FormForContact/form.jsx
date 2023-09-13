@@ -2,13 +2,16 @@ import { useState } from 'react';
 import React from 'react';
 import css from './form.module.css';
 import { nanoid } from 'nanoid';
-import { addContact } from 'redux/tasksSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContactToList } from 'redux/slice';
+import { toast } from 'react-toastify';
 
 export const Form = () => {
+  const dispatch = useDispatch();
+  const { contacts } = useSelector(state => state.contacts);
+
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const dispatch = useDispatch();
 
   const handleInputChange = event => {
     const { name, value } = event.target;
@@ -29,13 +32,28 @@ export const Form = () => {
     const newContact = {
       id: nanoid(),
       name: name,
-      number: number,
+      phone: number,
     };
+    const contactExists = contacts.some(
+      contacts => contacts.name.toLowerCase() === name.toLowerCase()
+    );
 
-    dispatch(addContact(newContact));
+    if (contactExists) {
+      toast.error('Already Added.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } else {
+      dispatch(addContactToList(newContact));
+    }
+
     reset();
   };
-  
+
   const reset = () => {
     setNumber('');
     setName('');
